@@ -1,0 +1,70 @@
+
+""" if picture input detects bird with google api, triggers servo movement.  """
+import io
+import os
+import google
+# Imports the Google Cloud client library
+from google.cloud import vision
+from google.cloud.vision import types
+#Run following line in script or command line on pi before calling function to authorize API call
+#os.system("[Service Account credentials: PATH]")
+import RPi.GPIO as GPIO
+import time
+
+
+# Instantiates a client
+client = vision.ImageAnnotatorClient()
+
+# The name of the image file to annotate
+file_name = os.path.join(
+    os.path.dirname(__file__),
+    'bird.jpg')
+
+# Loads the image into memory
+with io.open(file_name, 'rb') as image_file:
+    content = image_file.read()
+
+image = types.Image(content=content)
+
+# Performs label detection on the image file
+response = client.label_detection(image=image)
+labels = response.label_annotations
+
+
+
+for label in labels:
+    #if you want to see al the label descriptions run following line
+    #print(label.description)
+    
+    if 'bird'==str(label.description):
+        print('found bird')
+            
+    GPIO.setmode(GPIO.BOARD)
+
+    GPIO.setup(10, GPIO.OUT)
+
+    p = GPIO.PWM(10, 50)
+
+    p.start(7.5)
+
+    try:
+            while True:
+                    p.ChangeDutyCycle(7.5)  # turn towards 90 degree
+                    time.sleep(1) # sleep 1 second
+                    p.ChangeDutyCycle(2.5)  # turn towards 0 degree
+                    time.sleep(1) # sleep 1 second
+                    p.ChangeDutyCycle(12.5) # turn towards 180 degree
+                    time.sleep(1) # sleep 1 second 
+    except KeyboardInterrupt:
+            p.stop()
+        
+    GPIO.cleanup()
+    break
+
+        
+
+        
+        
+
+
+
