@@ -7,7 +7,7 @@ import google
 from google.cloud import vision
 from google.cloud.vision import types
 #Run following line in script or command line on pi before calling function to authorize API call
-#os.system("[Service Account credentials: PATH]")
+#export GOOGLE_APPLICATION_CREDENTIALS = 'PATH' 
 import RPi.GPIO as GPIO
 import time
 
